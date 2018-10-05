@@ -1,5 +1,5 @@
 # laravueblog
-練習Tony blog上的範例
+練習[Tony blog](http://blog.tonycube.com)上的範例
 
 ## 文章內容
 - [Vue.js (11) - 在 Laravel 中使用 Vue](http://blog.tonycube.com/2017/06/vuejs11-laravel-vue.html)
