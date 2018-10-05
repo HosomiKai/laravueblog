@@ -15,4 +15,5 @@ mix.js('resources/js/app.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css');
 
 mix.js('resources/js/hello.js', 'public/js')
+    .js('resources/js/post.js', 'public/js')
     .extract(['lodash','jquery','axios','vue']); //抽取全域套件
