@@ -34,7 +34,7 @@ class PostController extends Controller
         $post->title = $request->input('title', '沒有標題');
         $post->body = $request->input('body', '沒有內文。');
         $ok = $post->save();
-        return response()->json(['ok' => $ok], 200);
+        return response()->json(['ok' => $ok, 'thepost' => $post], 200);
     }
 
     /**

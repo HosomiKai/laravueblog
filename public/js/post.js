@@ -2542,7 +2542,7 @@ Popper.Defaults = Defaults;
 
 /***/ }),
 
-/***/ 11:
+/***/ 10:
 /***/ (function(module, exports) {
 
 /*
@@ -2625,7 +2625,7 @@ function toComment(sourceMap) {
 
 /***/ }),
 
-/***/ 12:
+/***/ 11:
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -2889,6 +2889,116 @@ module.exports = function listToStyles (parentId, list) {
 /***/ }),
 
 /***/ 4:
+/***/ (function(module, exports) {
+
+/* globals __VUE_SSR_CONTEXT__ */
+
+// IMPORTANT: Do NOT use ES2015 features in this file.
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
+
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier /* server only */
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
+
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
+  }
+
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+    options._compiled = true
+  }
+
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = injectStyles
+  }
+
+  if (hook) {
+    var functional = options.functional
+    var existing = functional
+      ? options.render
+      : options.beforeCreate
+
+    if (!functional) {
+      // inject component registration as beforeCreate hook
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    } else {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return existing(h, context)
+      }
+    }
+  }
+
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
+  }
+}
+
+
+/***/ }),
+
+/***/ 5:
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2904,7 +3014,7 @@ window.Popper = __webpack_require__(1).default;
 try {
   window.$ = window.jQuery = __webpack_require__(3);
 
-  __webpack_require__(5);
+  __webpack_require__(6);
 } catch (e) {}
 
 /**
@@ -2951,11 +3061,282 @@ if (token) {
 /**
  * load vue
  */
-window.Vue = __webpack_require__(6);
+window.Vue = __webpack_require__(7);
 
 /***/ }),
 
-/***/ 5:
+/***/ 54:
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(55);
+
+
+/***/ }),
+
+/***/ 55:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Post_vue__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Post_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_Post_vue__);
+__webpack_require__(5);
+
+
+
+// Vue.component('List', require('./components/List.vue'));
+new Vue({
+    el: '#app',
+    components: { Post: __WEBPACK_IMPORTED_MODULE_0__components_Post_vue___default.a }
+});
+
+/***/ }),
+
+/***/ 56:
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(57)
+}
+var normalizeComponent = __webpack_require__(4)
+/* script */
+var __vue_script__ = __webpack_require__(59)
+/* template */
+var __vue_template__ = __webpack_require__(60)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-5e8280ea"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/Post.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-5e8280ea", Component.options)
+  } else {
+    hotAPI.reload("data-v-5e8280ea", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+
+/***/ 57:
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(58);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(11)("0086265d", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5e8280ea\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Post.vue", function() {
+     var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5e8280ea\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Post.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+
+/***/ 58:
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(10)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.fade-item[data-v-5e8280ea] {\n    -webkit-transition: all .5s ease;\n    transition: all .5s ease;\n}\n.fade-item h1[data-v-5e8280ea] {\n    margin-top: 0;\n}\n#list[data-v-5e8280ea] {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 240px;\n    padding: 20px;\n    margin: 20px 0;\n    overflow: scroll;\n}\n#form[data-v-5e8280ea] {\n    position: fixed;\n    bottom: 0;\n    left: 0;\n    right: 0;\n    padding: 20px;\n    -webkit-box-shadow: 0 6px 20px 0 #333333;\n            box-shadow: 0 6px 20px 0 #333333;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ 59:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__List__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__List___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__List__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    components: {
+        List: __WEBPACK_IMPORTED_MODULE_0__List___default.a
+    },
+    data: function data() {
+        return {
+            posts: [],
+            post: {
+                id: null,
+                title: '',
+                body: ''
+            },
+            titleWarning: false,
+            bodyWarning: false,
+            isSave: false
+        };
+    },
+
+    methods: {
+        init: function init() {
+            var self = this;
+            axios.get('/api/posts').then(function (response) {
+                self.posts = response.data;
+            }).catch(function (response) {
+                console.log(response);
+            });
+        },
+        publish: function publish() {
+            this.titleWarning = this.post.title.trim().length == 0;
+            this.bodyWarning = this.post.body.trim().length == 0;
+            if (this.titleWarning || this.bodyWarning) return;
+            //
+            var self = this;
+            axios.post('/api/posts', this.post).then(function (response) {
+                if (response.data['ok']) {
+                    // self.init();
+                    self.posts.push(response.data['thepost']); //新增成功的話載入剛剛新增成功的資料
+                    self.titleWarning = false;
+                    self.bodyWarning = false;
+                    self.post = { id: null, title: '', body: '' };
+                }
+            }).catch(function (response) {
+                console.log(response);
+            });
+        },
+        modify: function modify(post) {
+            location.href = "#form";
+            this.post.id = post.id;
+            this.post.title = post.title;
+            this.post.body = post.body;
+            this.isSave = true;
+            console.log(this.post);
+        },
+        save: function save() {
+            var self = this;
+            axios.put('/api/posts/' + this.post.id, this.post).then(function (response) {
+                if (response.data['ok']) {
+                    // self.init();
+                    var i = void 0;
+                    var len = self.posts.length;
+                    //更新成功後更新本地端資料
+                    for (i = 0; i < len; i++) {
+                        if (self.posts[i].id == self.post.id) {
+                            self.posts[i].title = self.post.title;
+                            self.posts[i].body = self.post.body;
+                            break;
+                        }
+                    }
+                    self.isSave = false;
+                    self.post = { id: null, title: '', body: '' };
+                }
+            }).catch(function (response) {
+                console.log(response);
+            });
+        },
+
+        cancel: function cancel() {
+            this.post = { id: null, title: '', body: '' };
+            this.isSave = false;
+        },
+        remove: function remove(id) {
+            var self = this;
+            axios.delete('/api/posts/' + id).then(function (response) {
+                if (response.data['ok']) {
+                    // self.init();
+                    var i = void 0;
+                    var len = self.posts.length;
+                    //刪除本地端中的該項目
+                    for (i = 0; i < len; i++) {
+                        if (self.posts[i].id == id) {
+                            self.posts.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+            }).catch(function (response) {
+                console.log(response);
+            });
+        }
+    },
+    mounted: function mounted() {
+        this.init();
+    }
+});
+
+/***/ }),
+
+/***/ 6:
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -6906,248 +7287,6 @@ window.Vue = __webpack_require__(6);
 
 /***/ }),
 
-/***/ 54:
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(55);
-
-
-/***/ }),
-
-/***/ 55:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Post_vue__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Post_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_Post_vue__);
-__webpack_require__(4);
-
-
-
-new Vue({
-    el: '#app',
-    components: { Post: __WEBPACK_IMPORTED_MODULE_0__components_Post_vue___default.a }
-});
-
-/***/ }),
-
-/***/ 56:
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(57)
-}
-var normalizeComponent = __webpack_require__(7)
-/* script */
-var __vue_script__ = __webpack_require__(59)
-/* template */
-var __vue_template__ = __webpack_require__(60)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-5e8280ea"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources/js/components/Post.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-5e8280ea", Component.options)
-  } else {
-    hotAPI.reload("data-v-5e8280ea", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-
-/***/ 57:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(58);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(12)("0086265d", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5e8280ea\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Post.vue", function() {
-     var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5e8280ea\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Post.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 58:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(11)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n.content[data-v-5e8280ea] {\n    padding: 20px;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 59:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            posts: [],
-            post: {
-                id: null,
-                title: '',
-                body: ''
-            },
-            titleWarning: false,
-            bodyWarning: false,
-            isSave: false
-        };
-    },
-
-    methods: {
-        init: function init() {
-            var self = this;
-            axios.get('/api/posts').then(function (response) {
-                self.posts = response.data;
-            }).catch(function (response) {
-                console.log(response);
-            });
-        },
-        publish: function publish() {
-            this.titleWarning = this.post.title.trim().length == 0;
-            this.bodyWarning = this.post.body.trim().length == 0;
-            if (this.titleWarning || this.bodyWarning) return;
-            //
-            var self = this;
-            axios.post('/api/posts', this.post).then(function (response) {
-                if (response.data['ok']) {
-                    self.init();
-                    self.titleWarning = false;
-                    self.bodyWarning = false;
-                    self.post = { id: null, title: '', body: '' };
-                }
-            }).catch(function (response) {
-                console.log(response);
-            });
-        },
-        modify: function modify(post) {
-            location.href = "#form";
-            this.post.id = post.id;
-            this.post.title = post.title;
-            this.post.body = post.body;
-            this.isSave = true;
-            console.log(this.post);
-        },
-        save: function save() {
-            var self = this;
-            axios.put('/api/posts/' + this.post.id, this.post).then(function (response) {
-                if (response.data['ok']) {
-                    self.init();
-                    self.isSave = false;
-                    self.post = { id: null, title: '', body: '' };
-                }
-            }).catch(function (response) {
-                console.log(response);
-            });
-        },
-
-        cancel: function cancel() {
-            this.post = { id: null, title: '', body: '' };
-            this.isSave = false;
-        },
-        remove: function remove(id) {
-            var self = this;
-            axios.delete('/api/posts/' + id).then(function (response) {
-                if (response.data['ok']) {
-                    self.init();
-                }
-            }).catch(function (response) {
-                console.log(response);
-            });
-        }
-    },
-    mounted: function mounted() {
-        this.init();
-    }
-});
-
-/***/ }),
-
 /***/ 60:
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7159,41 +7298,45 @@ var render = function() {
     "div",
     { staticClass: "content" },
     [
-      _vm._l(_vm.posts, function(post) {
-        return _c("div", [
-          _c("h1", [_vm._v(_vm._s(post.title))]),
-          _vm._v(" "),
-          _c("p", [_vm._v(_vm._s(post.body))]),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-xs btn-primary",
-              on: {
-                click: function($event) {
-                  _vm.modify(post)
+      _c(
+        "List",
+        { attrs: { id: "list" } },
+        _vm._l(_vm.posts, function(post) {
+          return _c("div", { key: post.id, staticClass: "fade-item" }, [
+            _c("h1", [_vm._v(_vm._s(post.title))]),
+            _vm._v(" "),
+            _c("p", [_vm._v(_vm._s(post.body))]),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-xs btn-primary",
+                on: {
+                  click: function($event) {
+                    _vm.modify(post)
+                  }
                 }
-              }
-            },
-            [_vm._v("修改")]
-          ),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-xs btn-danger",
-              on: {
-                click: function($event) {
-                  _vm.remove(post.id)
+              },
+              [_vm._v("修改")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-xs btn-danger",
+                on: {
+                  click: function($event) {
+                    _vm.remove(post.id)
+                  }
                 }
-              }
-            },
-            [_vm._v("刪除")]
-          ),
-          _vm._v(" "),
-          _c("hr")
-        ])
-      }),
+              },
+              [_vm._v("刪除")]
+            ),
+            _vm._v(" "),
+            _c("hr")
+          ])
+        })
+      ),
       _vm._v(" "),
       _c("form", { attrs: { id: "form" } }, [
         _c(
@@ -7310,7 +7453,7 @@ var render = function() {
         ])
       ])
     ],
-    2
+    1
   )
 }
 var staticRenderFns = []
@@ -7325,113 +7468,142 @@ if (false) {
 
 /***/ }),
 
-/***/ 7:
-/***/ (function(module, exports) {
+/***/ 61:
+/***/ (function(module, exports, __webpack_require__) {
 
-/* globals __VUE_SSR_CONTEXT__ */
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(70)
+}
+var normalizeComponent = __webpack_require__(4)
+/* script */
+var __vue_script__ = __webpack_require__(64)
+/* template */
+var __vue_template__ = __webpack_require__(72)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/List.vue"
 
-// IMPORTANT: Do NOT use ES2015 features in this file.
-// This module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle.
-
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  functionalTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier /* server only */
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
-
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1856aeee", Component.options)
+  } else {
+    hotAPI.reload("data-v-1856aeee", Component.options)
   }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
 
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
+module.exports = Component.exports
 
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
-    options._compiled = true
-  }
 
-  // functional template
-  if (functionalTemplate) {
-    options.functional = true
-  }
+/***/ }),
 
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
-  }
+/***/ 64:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {};
     }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = injectStyles
-  }
+});
 
-  if (hook) {
-    var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
+/***/ }),
 
-    if (!functional) {
-      // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    } else {
-      // for template-only hot-reload because in that case the render fn doesn't
-      // go through the normalizer
-      options._injectStyles = hook
-      // register for functioal component in vue file
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return existing(h, context)
-      }
-    }
-  }
+/***/ 70:
+/***/ (function(module, exports, __webpack_require__) {
 
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
-  }
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(71);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(11)("d1a8d970", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1856aeee\",\"scoped\":false,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./List.vue", function() {
+     var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1856aeee\",\"scoped\":false,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./List.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
 }
 
+/***/ }),
+
+/***/ 71:
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(10)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.fade-enter-active,\n.fade-leave-active {\n    -webkit-transition: all .5s ease;\n    transition: all .5s ease;\n}\n.fade-leave-active {\n    position: absolute;\n}\n.fade-enter {\n    -webkit-transform: translateX(50px);\n            transform: translateX(50px);\n    opacity: 0;\n}\n.fade-leave-to {\n    -webkit-transform: translateX(-50px);\n            transform: translateX(-50px);\n    opacity: 0;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ 72:
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "transition-group",
+    { attrs: { name: "fade", tag: "div" } },
+    [_vm._t("default")],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-1856aeee", module.exports)
+  }
+}
 
 /***/ })
 

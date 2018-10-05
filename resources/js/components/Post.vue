@@ -1,12 +1,14 @@
 <template>
     <div class="content">
-        <div v-for="post in posts">
-            <h1>{{ post.title }}</h1>
-            <p>{{ post.body }}</p>
-            <button class="btn btn-xs btn-primary" @click="modify(post)">修改</button>
-            <button class="btn btn-xs btn-danger" @click="remove(post.id)">刪除</button>
-            <hr>
-        </div>
+        <List id="list">
+            <div v-for="post in posts" :key="post.id" class="fade-item">
+                <h1>{{ post.title }}</h1>
+                <p>{{ post.body }}</p>
+                <button class="btn btn-xs btn-primary" @click="modify(post)">修改</button>
+                <button class="btn btn-xs btn-danger" @click="remove(post.id)">刪除</button>
+                <hr>
+            </div>
+        </List>
         <form id="form">
             <div class="form-group" :class="{ 'has-warning': titleWarning }">
                 <label class="control-label">標題
@@ -31,7 +33,11 @@
     </div>
 </template>
 <script>
+    import List from './List';
     export default {
+        components: {
+            List
+        },
         data() {
             return {
                 posts: [],
@@ -65,7 +71,8 @@
                 axios.post('/api/posts', this.post)
                     .then(function (response) {
                         if (response.data['ok']) {
-                            self.init();
+                            // self.init();
+                            self.posts.push(response.data['thepost']); //新增成功的話載入剛剛新增成功的資料
                             self.titleWarning = false;
                             self.bodyWarning = false;
                             self.post = {id:null, title: '', body:''};
@@ -88,7 +95,17 @@
                 axios.put('/api/posts/' + this.post.id, this.post)
                     .then(function (response) {
                         if (response.data['ok']) {
-                            self.init();
+                            // self.init();
+                            let i;
+                            let len = self.posts.length;
+                            //更新成功後更新本地端資料
+                            for (i = 0; i < len; i++) {
+                                if (self.posts[i].id == self.post.id) {
+                                    self.posts[i].title = self.post.title;
+                                    self.posts[i].body = self.post.body;
+                                    break;
+                                }
+                            }
                             self.isSave = false;
                             self.post = {id:null, title: '', body:''};
                         }
@@ -107,7 +124,16 @@
                 axios.delete('/api/posts/' + id)
                     .then(function (response) {
                         if (response.data['ok']) {
-                            self.init();
+                            // self.init();
+                            let i;
+                            let len = self.posts.length;
+                            //刪除本地端中的該項目
+                            for (i = 0; i < len; i++) {
+                                if (self.posts[i].id == id) {
+                                    self.posts.splice(i, 1);
+                                    break;
+                                }
+                            }
                         }
                     })
                     .catch(function (response) {
@@ -122,7 +148,31 @@
 </script>
 
 <style scoped>
-    .content {
+    .fade-item {
+        transition: all .5s ease;
+    }
+
+    .fade-item h1 {
+        margin-top: 0;
+    }
+
+    #list {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 240px;
         padding: 20px;
+        margin: 20px 0;
+        overflow: scroll;
+    }
+
+    #form {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        box-shadow: 0 6px 20px 0 #333333;
     }
 </style>
